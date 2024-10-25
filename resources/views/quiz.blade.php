@@ -21,34 +21,15 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition when sidebar opens */
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: -300px; /* Initially off the screen */
-            width: 300px;
-            height: 100%;
-            background-color: #f8f9fa;
-            border-left: 1px solid #ddd;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            transition: right 0.3s ease, width 0.3s ease;
-            z-index: 1000;
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            color: #343a40;
+            margin-bottom: 20px;
         }
 
-        .sidebar.open {
-            right: 0;
-        }
-
-        /* When the sidebar is open, quiz container shifts and becomes responsive */
-        .container.sidebar-active {
-            margin-right: 320px; /* Leave room for the sidebar */
-        }
-
-        /* Question styles */
         .question {
             display: flex;
             align-items: center;
@@ -111,7 +92,6 @@
             background-color: #218838;
         }
 
-        /* Footer styles */
         footer {
             text-align: center;
             margin-top: 20px;
@@ -128,39 +108,70 @@
             text-decoration: underline;
         }
 
-        /* Whiteboard button */
-        .whiteboard-btn {
+        /* Sidebar styles */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            right: 0;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #f1f1f1;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        .sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+        }
+
+        #whiteboard-iframe {
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+        }
+
+        #openSidebarBtn {
             position: fixed;
             top: 20px;
             right: 20px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            z-index: 1001;
+            z-index: 9999;
         }
-
-        .whiteboard-btn:hover {
-            background-color: #0056b3;
-        }
-
-        /* Slider for whiteboard width */
-        .slider {
-            position: fixed;
-            top: 0;
-            right: 300px;
-            width: 10px;
-            height: 100%;
-            background-color: #ccc;
-            cursor: ew-resize;
-            z-index: 1002;
-        }
-
     </style>
 </head>
 <body>
+
+    <!-- Sidebar for Whiteboard -->
+    <div id="whiteboardSidebar" class="sidebar">
+        <a href="javascript:void(0)" class="close-btn" onclick="closeWhiteboard()">&times;</a>
+        <iframe id="whiteboard-iframe" src="https://excalidraw.com"></iframe>
+    </div>
+
+    <!-- Open Sidebar Button -->
+    <button id="openSidebarBtn" onclick="openWhiteboard()">Whiteboard</button>
 
     @if($mode === 'play_with_computer')
     <div id="progressBarContainer" style="position: sticky; top: 0; background: #f8f9fa; padding: 10px; width: 100%;">
@@ -178,18 +189,7 @@
     </div>
     @endif
 
-    <!-- Whiteboard Sidebar -->
-    <div class="sidebar" id="whiteboardSidebar">
-        <iframe src="https://excalidraw.com" width="100%" height="100%" frameborder="0"></iframe>
-    </div>
-
-    <!-- Whiteboard Width Slider -->
-    <div class="slider" id="whiteboardSlider"></div>
-
-    <!-- Whiteboard Toggle Button -->
-    <button class="whiteboard-btn" onclick="toggleWhiteboard()">Whiteboard</button>
-
-    <div class="container" id="quizContainer">
+    <div class="container">
         <h1>Quiz - {{ ucfirst($mode) === 'Campuran' ? 'Operasi Campuran' : ucfirst($mode) }} (Level: {{ ucfirst($level) }})</h1>
 
         <form action="/submit-quiz" method="POST" id="quizForm">
@@ -218,7 +218,8 @@
         // Set the current timestamp as the quiz start time when the form loads
         document.getElementById('startTime').value = Date.now();
 
-        // Progress update for 'play with computer' mode
+        // Optionally, you can also add logic to track time on the client side.
+
         @if($mode === 'play_with_computer')
         let totalQuestions = {{ count($questions) }};
         let playerProgress = 0;
@@ -241,39 +242,15 @@
         });
         @endif
 
-        // Whiteboard Sidebar Toggle
-        function toggleWhiteboard() {
-            const sidebar = document.getElementById('whiteboardSidebar');
-            const quizContainer = document.getElementById('quizContainer');
-            const slider = document.getElementById('whiteboardSlider');
-            
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-                slider.style.display = 'none';
-                quizContainer.classList.remove('sidebar-active');
-            } else {
-                sidebar.classList.add('open');
-                slider.style.display = 'block';
-                quizContainer.classList.add('sidebar-active');
-            }
+        // Functions to open and close the whiteboard sidebar
+        function openWhiteboard() {
+            document.getElementById("whiteboardSidebar").style.width = "400px";
         }
 
-        // Whiteboard Width Adjustment Slider
-        const slider = document.getElementById('whiteboardSlider');
-        const sidebar = document.getElementById('whiteboardSidebar');
+        function closeWhiteboard() {
+            document.getElementById("whiteboardSidebar").style.width = "0";
+        }
 
-        slider.addEventListener('mousedown', function (e) {
-            document.onmousemove = function (e) {
-                const newWidth = window.innerWidth - e.clientX;
-                if (newWidth > 200 && newWidth < 600) { // Set min/max width for the whiteboard
-                    sidebar.style.width = newWidth + 'px';
-                    slider.style.right = newWidth + 'px';
-                }
-            }
-            document.onmouseup = function () {
-                document.onmousemove = null;
-            }
-        });
     </script>
 
 </body>
