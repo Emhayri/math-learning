@@ -6,21 +6,35 @@
     <title>Quiz - {{ ucfirst($mode) }} ({{ ucfirst($level) }})</title>
     <style>
         /* General Styles */
-        body {
+        body, html {
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
             color: #343a40;
             margin: 0;
             padding: 0;
+            height: 100%;
+            overflow: hidden; /* Prevent body scrolling */
         }
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
+        /* Fixed layout for quiz page */
+        .quiz-page {
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Full-screen container for quiz questions */
+        .scrollable-container {
+            width: 60%; /* Default width when sidebar is hidden */
+            height: calc(100vh - 40px); /* Set height less for sticky button */
+            overflow-y: auto; /* Allow vertical scrolling */
             background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+            transition: width 0.5s ease; /* Smooth transition when resizing */
+            margin: 0 auto; /* Center the quiz when sidebar is hidden */
         }
 
         h1 {
@@ -86,6 +100,8 @@
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            position: sticky;
+            bottom: 0; /* Make the button sticky at the bottom */
         }
 
         .submit-btn:hover {
@@ -108,106 +124,116 @@
             text-decoration: underline;
         }
 
-        /* Sidebar styles */
-        .sidebar {
-            height: 100%;
-            width: 0;
+        /* Sidebar whiteboard */
+        #whiteboardSidebar {
+            width: 0; /* Start hidden */
             position: fixed;
-            z-index: 1;
             top: 0;
             right: 0;
-            background-color: #333;
+            height: 100%;
+            background-color: #f8f9fa;
             overflow-x: hidden;
             transition: 0.5s;
             padding-top: 60px;
+            box-shadow: -2px 0px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .sidebar a {
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: #f1f1f1;
-            display: block;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover {
-            background-color: #575757;
-        }
-
-        .sidebar .close-btn {
-            position: absolute;
-            top: 0;
-            right: 25px;
-            font-size: 36px;
-        }
-
-        #whiteboard-iframe {
-            width: 100%;
+        #whiteboardContent {
+            padding: 20px;
+            overflow-y: auto;
             height: calc(100% - 60px);
-            border: none;
         }
 
-        #openSidebarBtn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+        #openWhiteboardBtn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
             background-color: #007bff;
             color: white;
-            border: none;
-            padding: 10px 15px;
+            padding: 10px;
             border-radius: 5px;
-            cursor: pointer;
-            z-index: 9999;
+        }
+
+        #slider {
+            width: 10px;
+            position: absolute;
+            left: -10px;
+            top: 0;
+            bottom: 0;
+            cursor: ew-resize;
+            background-color: #333;
+        }
+
+        /* Scrollbar styling (optional) */
+        .scrollable-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable-container::-webkit-scrollbar-thumb {
+            background-color: #007bff;
+            border-radius: 10px;
+        }
+
+        .scrollable-container::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+        }
+
+        /* Progress bar for "Play with Computer" mode */
+        #progressBarContainer {
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            padding: 10px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        #progressBar {
+            height: 100%;
+            width: 0;
+            background-color: green;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar for Whiteboard -->
-    <div id="whiteboardSidebar" class="sidebar">
-        <a href="javascript:void(0)" class="close-btn" onclick="closeWhiteboard()">&times;</a>
-        <iframe id="whiteboard-iframe" src="https://excalidraw.com"></iframe>
-    </div>
+    <div class="quiz-page">
+        <!-- Scrollable Container for the Quiz -->
+        <div class="scrollable-container" id="quizContainer">
+            <h1>Quiz - {{ ucfirst($mode) === 'Campuran' ? 'Operasi Campuran' : ucfirst($mode) }} (Level: {{ ucfirst($level) }})</h1>
 
-    <!-- Open Sidebar Button -->
-    <button id="openSidebarBtn" onclick="openWhiteboard()">Whiteboard</button>
+            <form action="/submit-quiz" method="POST" id="quizForm">
+                @csrf
 
-    @if($mode === 'play_with_computer')
-    <div id="progressBarContainer" style="position: sticky; top: 0; background: #f8f9fa; padding: 10px; width: 100%;">
-        <div style="display: flex; justify-content: space-between;">
-            <div>
-                <strong>Progress Pemain: </strong><span id="playerProgress">0%</span>
-            </div>
-            <div>
-                <strong>Progress Komputer: </strong><span id="computerProgress">0%</span>
+                <!-- Add a hidden field to store the start time -->
+                <input type="hidden" name="start_time" id="startTime">
+
+                @foreach ($questions as $index => $question)
+                    <div class="question">
+                        <span class="question-number">{{ $index + 1 }}.</span>
+                        <span class="question-text">{{ $question }}</span>
+                        <input type="number" name="answers[]" placeholder="Jawaban">
+                    </div>
+                @endforeach
+
+                <button type="submit" class="submit-btn">Kirim Jawaban</button>
+            </form>
+        </div>
+
+        <!-- Whiteboard Sidebar -->
+        <div id="whiteboardSidebar">
+            <div id="slider"></div>
+            <div id="whiteboardContent">
+                <h2>Whiteboard</h2>
+                <!-- Excalidraw Whiteboard will be initialized here -->
+                <div id="excalidraw"></div>
             </div>
         </div>
-        <div style="background: #ddd; width: 100%; height: 20px; border-radius: 10px; margin-top: 10px;">
-            <div id="progressBar" style="height: 100%; width: 0; background-color: green; border-radius: 10px;"></div>
-        </div>
-    </div>
-    @endif
 
-    <div class="container">
-        <h1>Quiz - {{ ucfirst($mode) === 'Campuran' ? 'Operasi Campuran' : ucfirst($mode) }} (Level: {{ ucfirst($level) }})</h1>
-
-        <form action="/submit-quiz" method="POST" id="quizForm">
-            @csrf
-
-            <!-- Add a hidden field to store the start time -->
-            <input type="hidden" name="start_time" id="startTime">
-
-            @foreach ($questions as $index => $question)
-                <div class="question">
-                    <span class="question-number">{{ $index + 1 }}.</span>
-                    <span class="question-text">{{ $question }}</span>
-                    <input type="number" name="answers[]" placeholder="Jawaban">
-                </div>
-            @endforeach
-
-            <button type="submit" class="submit-btn">Kirim Jawaban</button>
-        </form>
+        <!-- Button to open Whiteboard -->
+        <div id="openWhiteboardBtn" onclick="toggleWhiteboard()">Whiteboard</div>
     </div>
 
     <footer>
@@ -218,7 +244,59 @@
         // Set the current timestamp as the quiz start time when the form loads
         document.getElementById('startTime').value = Date.now();
 
-        // Optionally, you can also add logic to track time on the client side.
+        // Function to toggle whiteboard sidebar and adjust quiz container width
+        function toggleWhiteboard() {
+            const sidebar = document.getElementById('whiteboardSidebar');
+            const quizContainer = document.getElementById('quizContainer');
+
+            if (sidebar.style.width === '0px' || sidebar.style.width === '') {
+                sidebar.style.width = '400px'; // Open the sidebar to 400px
+                quizContainer.style.width = 'calc(100% - 400px)'; // Reduce quiz container size
+                quizContainer.style.margin = '0'; // Remove centering
+            } else {
+                sidebar.style.width = '0'; // Close the sidebar
+                quizContainer.style.width = '60%'; // Restore to red box size
+                quizContainer.style.margin = '0 auto'; // Center the quiz
+            }
+        }
+
+        // Function to allow slider resize for whiteboard
+        const slider = document.getElementById('slider');
+        const whiteboardSidebar = document.getElementById('whiteboardSidebar');
+        const quizContainer = document.getElementById('quizContainer');
+
+        slider.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+
+            document.addEventListener('mousemove', resize, false);
+            document.addEventListener('mouseup', stopResize, false);
+        });
+
+        function resize(e) {
+            const newWidth = e.clientX;
+            const sidebarWidth = window.innerWidth - newWidth;
+
+            if (sidebarWidth >= 200 && sidebarWidth <= window.innerWidth - 200) {
+                whiteboardSidebar.style.width = sidebarWidth + 'px';
+                quizContainer.style.width = (window.innerWidth - sidebarWidth) + 'px';
+            }
+        }
+
+        function stopResize() {
+            document.removeEventListener('mousemove', resize, false);
+            document.removeEventListener('mouseup', stopResize, false);
+        }
+
+        // Initialize Excalidraw Whiteboard
+        async function initializeExcalidraw() {
+            const { ExcalidrawApp } = await import('@excalidraw/excalidraw');
+            const excalidrawWrapper = document.getElementById('excalidraw');
+            const excalidrawApp = ExcalidrawApp({});
+            excalidrawWrapper.appendChild(excalidrawApp);
+        }
+
+        // Call the function to initialize Excalidraw
+        initializeExcalidraw();
 
         @if($mode === 'play_with_computer')
         let totalQuestions = {{ count($questions) }};
@@ -241,17 +319,6 @@
             input.addEventListener('input', updateProgress);
         });
         @endif
-
-        // Functions to open and close the whiteboard sidebar
-        function openWhiteboard() {
-            document.getElementById("whiteboardSidebar").style.width = "400px";
-        }
-
-        function closeWhiteboard() {
-            document.getElementById("whiteboardSidebar").style.width = "0";
-        }
-
     </script>
-
 </body>
 </html>
