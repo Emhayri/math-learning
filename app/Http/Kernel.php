@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
     ];
 
     /**
@@ -36,6 +37,10 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
+            \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
+            \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
+            // Other middlewares
         ],
 
         'api' => [

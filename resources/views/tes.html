@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Designer & Coder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #fff;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav a, .social a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+
+        .intro {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .title {
+            padding: 0 20px;
+        }
+
+        .designer, .coder {
+            font-size: 40px;
+            font-weight: bold;
+        }
+
+        .description {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .portrait {
+            position: relative;
+        }
+
+        .portrait img {
+            max-width: 150px;
+            border-radius: 50%;
+            filter: grayscale(100%) contrast(150%) brightness(90%);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+        }
+
+        .work {
+            background: #f4f4f4;
+            padding: 50px 20px;
+        }
+
+        .work h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .projects {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .project {
+            background: #fff;
+            padding: 20px;
+            margin: 10px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .project-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            background: #ddd;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #333;
+            border-radius: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">AD</div>
+        <nav>
+            <a href="#about">about</a>
+            <a href="#portfolio">portfolio</a>
+            <a href="#blog">blog</a>
+            <a href="#contact">contact</a>
+        </nav>
+        <div class="social">
+            <a href="#" class="icon twitter">Twitter</a>
+            <a href="#" class="icon linkedin">LinkedIn</a>
+            <a href="#" class="icon github">GitHub</a>
+            <a href="#" class="icon instagram">Instagram</a>
+        </div>
+    </header>
+    
+    <main>
+        <section class="intro">
+            <div class="title">
+                <span class="designer">designer</span>
+                <span class="description">Product designer specializing in UI design and design systems.</span>
+            </div>
+            <div class="portrait">
+                <!-- Gantilah 'portrait-abstract.jpg' dengan link gambar yang Anda miliki -->
+                <img src="wallpaper/dk.jpg" alt="Designer and Coder Portrait">
+            </div>
+            <div class="title">
+                <span class="coder">&lt;coder&gt;</span>
+                <span class="description">Front-end developer who writes clean, elegant, and efficient code.</span>
+            </div>
+        </section>
+
+        <section class="work">
+            <h2>Some of My Latest Work</h2>
+            <div class="projects">
+                <div class="project">
+                    <div class="project-title">Canberra vs South Sydney</div>
+                    <div class="project-description">Creating a lean design system</div>
+                    <span class="tag">Design system</span>
+                </div>
+                <div class="project">
+                    <div class="project-title">Interior design news feed</div>
+                    <div class="project-description">Interior design article feed</div>
+                    <span class="tag">Side project</span>
+                </div>
+                <div class="project">
+                    <div class="project-title">Qantas map search</div>
+                    <div class="project-description">Product design</div>
+                    <span class="tag">Product design</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2022 Your Name</p>
+    </footer>
+</body>
+</html>

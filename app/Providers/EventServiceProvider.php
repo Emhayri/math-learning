@@ -18,6 +18,8 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        \App\Events\RoomJoinedEvent::class => [],
+         \App\Events\RoomLeftEvent::class => [],
     ];
 
     /**
